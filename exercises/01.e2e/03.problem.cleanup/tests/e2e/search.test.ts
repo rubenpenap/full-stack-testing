@@ -5,7 +5,7 @@ import { createUser } from '../db-utils.ts'
 test('Search from home page', async ({ page }) => {
 	const userData = createUser()
 	const newUser = await prisma.user.create({
-		select: { name: true, username: true },
+		select: { id: true, name: true, username: true },
 		data: userData,
 	})
 	await page.goto('/')
@@ -30,5 +30,5 @@ test('Search from home page', async ({ page }) => {
 	await expect(userList.getByRole('listitem')).not.toBeVisible()
 	await expect(page.getByText(/no users found/i)).toBeVisible()
 
-	// 🐨 delete the user you created here
+	await prisma.user.delete({ where: { id: newUser.id } })
 })
