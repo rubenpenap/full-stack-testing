@@ -1,39 +1,32 @@
-import {
-	// 💣 remove expect here (you'll get it from your test variable below)
-	expect,
-	// 🐨 alias this to "base"
-	test,
-} from '@playwright/test'
+import { test as base } from '@playwright/test'
 import { prisma } from '#app/utils/db.server.ts'
 import { createUser } from '../db-utils.ts'
 
-// 🐨 add a "test" variable here that extends the base test and adds a fixture
-// 🐨 create a fixture called insertNewUser. It doesn't require any arguments,
-// and it should return the following type:
-// Promise<{
-//   id: string
-//   name: string | null
-//   username: string
-// }>
-// 🐨 The utility should store a `userId` outside of the `use` callback.
-// 🐨 Then call `use` with an async callback that creates a new user and stores
-// the user's id in the `userId` variable.
-// 🐨 Then delete the user using prisma.user.deleteMany({ where: { id: userId } })
-// 🦉 We're using deleteMany instead of "delete" to avoid issues if the user somehow does not exist.
-// 🐨 get expect from test.expect here
+const test = base.extend<{
+	insertNewUser(): Promise<{
+		id: string
+		name: string | null
+		username: string
+	}>
+}>({
+	insertNewUser: async ({}, use) => {
+		let userId: string | undefined = undefined
+		await use(async () => {
+			const userData = createUser()
+			const newUser = await prisma.user.create({
+				select: { id: true, name: true, username: true },
+				data: userData,
+			})
+			userId = newUser.id
+			return newUser
+		})
+		await prisma.user.deleteMany({ where: { id: userId } })
+	},
+})
+const { expect } = test
 
-test('Search from home page', async ({
-	page,
-	// 🐨 get the insertNewUser fixture here
-}) => {
-	// 🐨 move this stuff up into the fixture's use callback.
-	const userData = createUser()
-	const newUser = await prisma.user.create({
-		select: { id: true, name: true, username: true },
-		data: userData,
-	})
-	// 🐨 The newUser variable should be assigned to the result of calling insertNewUser
-
+test('Search from home page', async ({ page, insertNewUser }) => {
+	const newUser = await insertNewUser()
 	// throw new Error('🧝‍♂️ Oh no, I broke it')
 	await page.goto('/')
 
@@ -56,7 +49,4 @@ test('Search from home page', async ({
 
 	await expect(userList.getByRole('listitem')).not.toBeVisible()
 	await expect(page.getByText(/no users found/i)).toBeVisible()
-
-	// 💣 you can remove this now
-	await prisma.user.delete({ where: { id: newUser.id } })
 })
