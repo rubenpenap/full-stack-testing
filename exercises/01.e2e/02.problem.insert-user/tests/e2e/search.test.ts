@@ -1,23 +1,26 @@
 import { expect, test } from '@playwright/test'
-// 🐨 get a prisma client from #app/utils/db.server.ts
-// 🐨 get the createUser util from ../db-utils.ts
+import { prisma } from '#app/utils/db.server.ts'
+import { createUser } from '../db-utils.ts'
 
 test('Search from home page', async ({ page }) => {
-	// 🐨 create a new user in the database.
+	const newUser = await prisma.user.create({
+		select: { name: true, username: true },
+		data: createUser(),
+	})
 	await page.goto('/')
 
-	// 🐨 fill in the new user's username
-	await page.getByRole('searchbox', { name: /search/i }).fill('kody')
+	await page.getByRole('searchbox', { name: /search/i }).fill(newUser.username)
 	await page.getByRole('button', { name: /search/i }).click()
 
-	// 🐨 swap out "kody" for the user's username
-	// 💯 handle encoding this properly using URLSearchParams
-	await page.waitForURL(`/users?search=kody`)
+	await page.waitForURL(
+		`/users?${new URLSearchParams({ search: newUser.username })}`,
+	)
 	await expect(page.getByText('Epic Notes Users')).toBeVisible()
 	const userList = page.getByRole('main').getByRole('list')
 	await expect(userList.getByRole('listitem')).toHaveCount(1)
-	// 🐨 update this to be user's name (with a fallback to their username)
-	await expect(page.getByAltText('kody')).toBeVisible()
+	await expect(
+		page.getByAltText(newUser.name ?? newUser.username),
+	).toBeVisible()
 
 	await page.getByRole('searchbox', { name: /search/i }).fill('__nonexistent__')
 	await page.getByRole('button', { name: /search/i }).click()
