@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker'
 import { prisma } from '#app/utils/db.server.ts'
 import { invariant } from '#app/utils/misc.tsx'
+import { requireEmail } from '#tests/mocks/resend.ts'
 import { createUser, test as base, waitFor } from '#tests/playwright-utils.ts'
 
 const URL_REGEX = /(?<url>https?:\/\/[^\s$.?#].[^\s]*)/
@@ -53,11 +54,9 @@ test('onboarding with link', async ({ page, getOnboardingData }) => {
 	).toBeVisible()
 	await expect(page.getByText(/check your email/i)).toBeVisible()
 
-	const email = (await waitFor(() => {
-		// 🐨 once you've implemented your requireEmail function in the resend mock
-		// use it here to get the email that was set to the onboardingData.email
-		throw new Error('Not yet implemented')
-	})) as any
+	const email = await waitFor(() => {
+		return requireEmail(onboardingData.email.toLowerCase())
+	})
 
 	expect(email.to).toBe(onboardingData.email.toLowerCase())
 	expect(email.from).toBe('hello@epicstack.dev')
