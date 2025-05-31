@@ -24,9 +24,10 @@ export const handlers: Array<HttpHandler> = [
 		const email = EmailSchema.parse(await request.json())
 		console.info('🔶 mocked email contents:', email)
 
-		// 🐨 write the email as json to a json file in the email directory with the
-		// filename set to the "to" email address.
-		// 💰 await fsExtra.writeJSON(path.join(emailFixturesDirPath, `./${email.to}.json`), email)
+		await fsExtra.writeJSON(
+			path.join(emailFixturesDirPath, `./${email.to}.json`),
+			email,
+		)
 
 		return json({
 			id: faker.string.uuid(),
