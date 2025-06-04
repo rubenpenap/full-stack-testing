@@ -1,24 +1,7 @@
 import { faker } from '@faker-js/faker'
-import { beforeEach, expect, test, vi, type MockInstance } from 'vitest'
+import { expect, test } from 'vitest'
+import { consoleError } from '#tests/setup/setup-test-env.ts'
 import { getErrorMessage } from './misc.tsx'
-
-// 🐨 move everything between here and the next 🐨 to the setup file
-let consoleError: MockInstance<typeof console.error>
-
-beforeEach(() => {
-	const originalConsoleError = console.error
-	consoleError = vi.spyOn(console, 'error')
-	consoleError.mockImplementation(
-		(...args: Parameters<typeof console.error>) => {
-			originalConsoleError(...args)
-			throw new Error(
-				'Console error was called. Call consoleError.mockImplementation(() => {}) if this is expected.',
-			)
-		},
-	)
-})
-// 🐨 move everything between here and the previous 🐨 to the setup file
-
 test('Error object returns message', () => {
 	const message = faker.lorem.words(2)
 	expect(getErrorMessage(new Error(message))).toBe(message)
