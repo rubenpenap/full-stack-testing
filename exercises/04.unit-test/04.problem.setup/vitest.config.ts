@@ -8,7 +8,7 @@ export default defineConfig({
 	css: { postcss: { plugins: [] } },
 	test: {
 		include: ['./app/**/*.test.{ts,tsx}'],
-		// 🐨 add setupFiles that points to './tests/setup/setup-test-env.ts'
+		setupFiles: ['./tests/setup/setup-test-env.ts'],
 		restoreMocks: true,
 		coverage: {
 			include: ['app/**/*.{ts,tsx}'],
