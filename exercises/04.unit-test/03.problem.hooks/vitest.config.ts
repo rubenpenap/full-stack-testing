@@ -8,7 +8,7 @@ export default defineConfig({
 	css: { postcss: { plugins: [] } },
 	test: {
 		include: ['./app/**/*.test.{ts,tsx}'],
-		// 🐨 add restoreMocks: true here
+		restoreMocks: true,
 		coverage: {
 			include: ['app/**/*.{ts,tsx}'],
 			all: true,
