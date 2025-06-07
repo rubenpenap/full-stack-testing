@@ -1,11 +1,11 @@
-// 🐨 add the jsdom comment pragma here
+/**
+ * @vitest-environment jsdom
+ */
+import { render, screen } from '@testing-library/react'
+import { expect, test } from 'vitest'
+import { ErrorList } from './forms.tsx'
 
-// 🐨 import render and screen from @testing-library/react
-// 🐨 import expect and test from vitest
-// 🐨 import the ErrorList component from './forms.tsx'
-
-// 🐨 create a test for "shows nothing when given an empty list"
-//   🐨 render the <ErrorList /> with no props
-//   🐨 using queryAllByRole, ensure there are no listitems on the screen
-//   💰 because queryAllByRole returns an array, you can use the toHaveLength
-//      utility from vitest to ensure the length is 0
+test('shows nothing when given an empty list', async () => {
+	await render(<ErrorList />)
+	expect(screen.queryAllByRole('listitem')).toHaveLength(0)
+})
