@@ -2,15 +2,11 @@
  * @vitest-environment jsdom
  */
 import { faker } from '@faker-js/faker'
-// 🐨 get cleanup from here:
-import { render, screen } from '@testing-library/react'
-// 🐨 get afterEach from here:
-import { expect, test } from 'vitest'
+import { render, screen, cleanup } from '@testing-library/react'
+import { expect, test, afterEach } from 'vitest'
 import { ErrorList } from './forms.tsx'
 
-// 🐨 add an afterEach here that calls cleanup
-
-// 🦉 that's it... The tests should pass now.
+afterEach(() => cleanup())
 
 test('shows nothing when given an empty list', async () => {
 	await render(<ErrorList />)
@@ -25,8 +21,6 @@ test('shows a single error', async () => {
 })
 
 test('shows multiple errors', async () => {
-	// 🐨 add a screen.debug() here to test what things look like before/after
-	// you add the cleanup call
 	const errors = [faker.lorem.words(3), faker.lorem.words(3)]
 	await render(<ErrorList errors={errors} />)
 	const errorEls = screen.getAllByRole('listitem')
