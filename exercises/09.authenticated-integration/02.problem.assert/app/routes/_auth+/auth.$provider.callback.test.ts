@@ -243,11 +243,17 @@ function assertToastSent(response: Response) {
 }
 
 async function assertSessionMade(response: Response, userId: string) {
-	// 🐨 get the set-cookie header from the response
-	// 🐨 parse the set-cookie header with setCookieParser.splitCookiesString
-	// 🐨 assert that one of the parsed cookies has the 'en_session' in it
-	// 🐨 lookup the new session in the database by the userId
-	// 🐨 assert the session exists
+	const setCookie = response.headers.get('set-cookie')
+	invariant(setCookie, 'set-cookie header should be set')
+	const parsedCookie = setCookieParser.splitCookiesString(setCookie)
+	expect(parsedCookie).toEqual(
+		expect.arrayContaining([expect.stringContaining('en_session')]),
+	)
+	const session = await prisma.session.findFirst({
+		select: { id: true },
+		where: { userId },
+	})
+	expect(session).toBeTruthy()
 }
 
 function assertRedirect(response: Response, redirectTo: string) {
