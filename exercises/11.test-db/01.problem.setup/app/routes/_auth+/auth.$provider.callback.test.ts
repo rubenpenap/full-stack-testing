@@ -8,7 +8,7 @@ import { GITHUB_PROVIDER_NAME } from '#app/utils/connections.tsx'
 import { prisma } from '#app/utils/db.server.ts'
 import { invariant } from '#app/utils/misc.tsx'
 import { sessionStorage } from '#app/utils/session.server.ts'
-import { createUser, insertNewUser } from '#tests/db-utils.ts'
+import { createUser } from '#tests/db-utils.ts'
 import { insertGitHubUser, deleteGitHubUsers } from '#tests/mocks/github.ts'
 import { server } from '#tests/mocks/index.ts'
 import { consoleError } from '#tests/setup/setup-test-env.ts'
@@ -241,14 +241,10 @@ async function setupRequest({
 }
 
 async function setupUser(userData = createUser()) {
-	// 🐨 Because our database is completely reset beetween tests, you can skip the
-	// insertNewUser and do a nested create now!
-	const user = await insertNewUser(userData)
 	const session = await prisma.session.create({
 		data: {
 			expirationDate: getSessionExpirationDate(),
-			// 🐨 use a nested create instead:
-			userId: user.id,
+			user: { create: userData },
 		},
 		select: {
 			id: true,
