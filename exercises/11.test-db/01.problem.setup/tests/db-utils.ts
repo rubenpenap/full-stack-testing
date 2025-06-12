@@ -69,7 +69,7 @@ export async function getNoteImages() {
 		}),
 		img({
 			altText:
-				'an office full of laptops and other office equipment that look like it was abandond in a rush out of the building in an emergency years ago.',
+				'an office full of laptops and other office equipment that look like it was abandoned in a rush out of the building in an emergency years ago.',
 			filepath: './tests/fixtures/images/notes/6.png',
 		}),
 		img({
@@ -88,9 +88,6 @@ export async function getNoteImages() {
 
 	return noteImages
 }
-
-// 🐨 we don't need this anymore!
-export const insertedUsers = new Set<string>()
 
 export async function insertNewUser({
 	username,
@@ -111,8 +108,6 @@ export async function insertNewUser({
 			password: { create: { hash: await getPasswordHash(password) } },
 		},
 	})
-	// 🐨 delete this too
-	insertedUsers.add(user.id)
 	return user as typeof user & { name: string }
 }
 
