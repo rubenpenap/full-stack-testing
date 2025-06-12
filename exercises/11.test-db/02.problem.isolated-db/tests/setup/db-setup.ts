@@ -3,9 +3,7 @@ import { execaCommand } from 'execa'
 import fsExtra from 'fs-extra'
 import { afterAll, afterEach, beforeAll } from 'vitest'
 
-// 🐨 update this file path to include the process.env.VITEST_POOL_ID variable
-// to keep it unique and then move this file to tests/setup/db-setup.ts.
-const databaseFile = `./tests/prisma/data.db`
+const databaseFile = `./tests/prisma/data.${process.env.VITEST_POOL_ID}.db`
 const databasePath = path.join(process.cwd(), databaseFile)
 process.env.DATABASE_URL = `file:${databasePath}`
 
